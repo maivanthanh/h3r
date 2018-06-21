@@ -1,0 +1,24 @@
+<html>
+<style>
+  #container {
+    display: block;
+    width: 98%;
+    height: 98%;
+    margin: auto;
+    background: lightgray;
+    box-shadow : 7px 7px lightgray;
+    border: 2px solid black;
+  }
+
+</style>
+ <script src="../js/h3r.js"> </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function(event) { 
+        h3r.CreateClip(document.getElementById("container")); 
+    });
+  </script>
+  <body>
+    <div id="container">
+    </div>
+  </body>
+</html>
