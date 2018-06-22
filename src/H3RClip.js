@@ -10,8 +10,8 @@ var H3RClip = function(data, container) {
   this.initGUI(container);
   this.clock = new THREE.Clock();
   this.scene = new THREE.Scene();
-  this.mixers = [];
-  this.actions = [];
+  this.duration = 0;
+  this.state = "play";
   global.scene = this.scene;
   
   var size = this.GUI.ViewSize();
@@ -28,6 +28,13 @@ var H3RClip = function(data, container) {
   this.control.update();
 
   this.animate();
+}
+
+H3RClip.prototype.Pause = function() {
+  this.state = "pause";
+}
+
+H3RClip.prototype.Time = function(time) {
 }
 
 H3RClip.prototype.initGUI = function(container) {
@@ -48,8 +55,14 @@ H3RClip.prototype.addFromFile = function(path) {
 
     gltf.animations.forEach(function(animation) {
       this.mixer.clipAction(animation).play();
+      console.log(animation);
+      this.GUI.duration =
+        Math.max(this.GUI.duration, animation.duration);
+      this.duration = 
+        Math.max(this.duration, animation.duration);
     }.bind(this));
-
+    
+    global.mixer = this.mixer;
   }.bind(this),
   function ( xhr ) {
     console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -58,7 +71,8 @@ H3RClip.prototype.addFromFile = function(path) {
 }
 
 H3RClip.prototype.animate = function() {
-  requestAnimationFrame( this.animate.bind(this) );
+
+    requestAnimationFrame( this.animate.bind(this) );
   var size = this.GUI.ViewSize();
   this.camera.aspect = size.ratio;
   this.camera.updateProjectionMatrix();
@@ -66,8 +80,13 @@ H3RClip.prototype.animate = function() {
   this.control.update();
   this.renderer.render( this.scene, this.camera );
   var delta = this.clock.getDelta();
-  if ( this.mixer ) {
+  if ( this.mixer  && this.state == "play" ) {
     this.mixer.update(delta);
+    this.GUI.Time(this.mixer.time);
+    if (this.mixer.time > this.duration) {
+      this.mixer.time -= this.duration;
+    }
+//    console.log(this.GUI.duration, this.GUI.currentTime);
   }
 }
 

@@ -3,8 +3,13 @@ import $ from "jquery";
 var GUI = function(container) {
   this.container = $(container);
   this.container.css("position", "relative");
+
+  this.duration    = 0.0;
+  this.currentTime = 0.0;
+
   this.initView();
   this.initGUI();
+  this.Time();
 }
 
 GUI.prototype.initView = function() {
@@ -12,7 +17,6 @@ GUI.prototype.initView = function() {
   c.append("<div class='h3r-view'> </div>");
   this.jviewContainer = c.find(".h3r-view").first();
   this.ViewContainer = this.jviewContainer[0];
-
 
   this.jviewContainer.css({
     width:  "100%",
@@ -32,11 +36,23 @@ GUI.prototype.initGUI = function() {
   this.jGUIcontainer.css( {
     "position" : "absolute",
     "bottom": "0px",
-    "width" : "100%"
+    "width" : "100%",
+    "left" : "0.5%"
   });
 }
 
+GUI.prototype.Time = function(time) {
+  this.currentTime = time ? time : this.currentTime;
+  if (this.duration == 0) {
+    this.jslider.val(0);
+    return;
+  };
+  var ratio = this.currentTime / this.duration;
+  this.jslider.val(ratio);
+}
+
 GUI.prototype.On = function(event, handler) {
+
 
 }
 
@@ -52,7 +68,15 @@ GUI.prototype.ViewSize = function() {
 }
 
 GUI.prototype.initSlider = function(){
-  this.jGUIcontainer.append("<input type='range' id='h3r-slider'>");
+  var slider = $("<input type='range' id='h3r-slider' min='0.0' max='1.0' step='any'>");
+
+  this.jGUIcontainer.append(slider);
+  slider.css( {
+    "display" : "inline-block",
+    "width" : "99%"
+  });
+
+  this.jslider = slider;
 }
 
 GUI.prototype.initPlayBtn = function() {
@@ -64,9 +88,7 @@ GUI.prototype.initPlayBtn = function() {
   this.jplay = play;
 
   play.css({
-    "position" : "absolute",
-    "bottom" : "1%", 
-    "left" : "1%",
+    "display" : "inline-block",
     "font-size" : "14pt",
   });
 }
