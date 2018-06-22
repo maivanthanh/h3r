@@ -6,22 +6,20 @@ import GUI from  "./gui/GUI.js";
 const loader = new GLTFLoader();
 
 var H3RClip = function(data, container) {
-  this.GUI = new GUI(container);
+  
+  this.initGUI(container);
   this.clock = new THREE.Clock();
-  this.container = container;
-  this.scene     = new THREE.Scene();
+  this.scene = new THREE.Scene();
   this.mixers = [];
   this.actions = [];
   global.scene = this.scene;
   
-  var 
-    width = container.offsetWidth,
-    height = container.offsetHeight;
-  this.camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 1000 );
+  var size = this.GUI.ViewSize();
+  this.camera = new THREE.PerspectiveCamera( 75, size.ratio , 0.1, 1000 );
   this.renderer = new THREE.WebGLRenderer( {antialias: true} );
   this.container.appendChild( this.renderer.domElement );
   this.camera.position.z = 5;
-  this.scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 0.3));
+  this.scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 3));
 
   this.scene.background = new THREE.Color( 0xffffff );
   this.addFromFile("../../data/gltf/girl/girl-lowpoly-rig.gltf");
@@ -30,6 +28,11 @@ var H3RClip = function(data, container) {
   this.control.update();
 
   this.animate();
+}
+
+H3RClip.prototype.initGUI = function(container) {
+  this.GUI = new GUI(container);
+  this.container = this.GUI.ViewContainer;
 }
 
 H3RClip.prototype.addFromFile = function(path) {
@@ -56,12 +59,10 @@ H3RClip.prototype.addFromFile = function(path) {
 
 H3RClip.prototype.animate = function() {
   requestAnimationFrame( this.animate.bind(this) );
-  var 
-    width = this.container.offsetWidth - 6,
-    height = this.container.offsetHeight - 6;
-  this.camera.aspect = width / height;
+  var size = this.GUI.ViewSize();
+  this.camera.aspect = size.ratio;
   this.camera.updateProjectionMatrix();
-  this.renderer.setSize( width , height);
+  this.renderer.setSize( size.width, size.height );
   this.control.update();
   this.renderer.render( this.scene, this.camera );
   var delta = this.clock.getDelta();

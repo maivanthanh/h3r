@@ -4,7 +4,8 @@
   "description": "Hmi's 3D renderer",
   "main": "index.js",
   "scripts": {
-    "test": "webpack-dev-server --config webpack.dev.js --watch"
+    "test": "webpack-dev-server --config webpack.dev.js --watch",
+    "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,10 @@
     "jquery": "^3.3.1",
     "three": "^0.93.0",
     "three-addons": "^1.2.0",
+    "three-full": "^6.0.0",
     "three-gltf-loader": "^1.93.0"
+  },
+  "devDependencies": {
+    "uglifyjs-webpack-plugin": "^1.2.6"
   }
 }
