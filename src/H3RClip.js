@@ -1,15 +1,17 @@
 import * as THREE from "three-full";
 import GLTFLoader from "three-gltf-loader";
 import { OrbitControl } from "three-addons";
+import GUI from  "./gui/GUI.js";
 
 const loader = new GLTFLoader();
 
 var H3RClip = function(data, container) {
+  this.GUI = new GUI(container);
   this.clock = new THREE.Clock();
   this.container = container;
   this.scene     = new THREE.Scene();
-  this.actions   = [];
   this.mixers = [];
+  this.actions = [];
   global.scene = this.scene;
   
   var 
@@ -19,10 +21,11 @@ var H3RClip = function(data, container) {
   this.renderer = new THREE.WebGLRenderer( {antialias: true} );
   this.container.appendChild( this.renderer.domElement );
   this.camera.position.z = 5;
-  this.scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 1.2));
+  this.scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 0.3));
+
   this.scene.background = new THREE.Color( 0xffffff );
-  this.addFromFile("../../data/gltf/cube/cube-1.glb");
-  this.addFromFile("../../data/gltf/cube/cube-2.glb"); 
+  this.addFromFile("../../data/gltf/girl/girl-lowpoly-rig.gltf");
+
   this.control = new THREE.OrbitControls( this.camera , this.container );
   this.control.update();
 
@@ -31,15 +34,24 @@ var H3RClip = function(data, container) {
 
 H3RClip.prototype.addFromFile = function(path) {
   loader.load(path, function(gltf) {
+    global.gltf = global.gltf ? global.gltf : [];
+    global.gltf.push(gltf);
     this.scene.add(gltf.scene);
     this.scene.traverse(function (object) {
       object.frustumCulled = false;
     });
-    var mixer = new THREE.AnimationMixer(gltf.scene);
-    var action = mixer.clipAction(gltf.animations[0]);
-    this.mixers.push(mixer);
-    console.log(this.mixers);
-  }.bind(this));
+    this.mixer = new THREE.AnimationMixer(gltf.scene);
+    if (!gltf.animations) return;
+
+    gltf.animations.forEach(function(animation) {
+      this.mixer.clipAction(animation).play();
+    }.bind(this));
+
+  }.bind(this),
+  function ( xhr ) {
+    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+  }
+  );
 }
 
 H3RClip.prototype.animate = function() {
@@ -52,14 +64,10 @@ H3RClip.prototype.animate = function() {
   this.renderer.setSize( width , height);
   this.control.update();
   this.renderer.render( this.scene, this.camera );
-  if (this.mixers[0]  && this.mixers[1]) {
-    this.mixers[0].update(this.clock.getDelta());
-    this.mixers[1].update(this.clock.getDelta());
+  var delta = this.clock.getDelta();
+  if ( this.mixer ) {
+    this.mixer.update(delta);
   }
-
-//this.mixers.forEach(function(mixer) {
-//  mixer.update( this.clock.getDelta() );
-//}.bind(this))
 }
 
 export default H3RClip;
