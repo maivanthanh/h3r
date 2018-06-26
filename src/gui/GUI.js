@@ -1,9 +1,9 @@
 import $ from "jquery";
 
-var GUI = function(container) {
+var GUI = function(container, clip) {
   this.container = $(container);
   this.container.css("position", "relative");
-
+  this.clip        = clip;
   this.duration    = 0.0;
   this.currentTime = 0.0;
 
@@ -37,7 +37,7 @@ GUI.prototype.initGUI = function() {
     "position" : "absolute",
     "bottom": "0px",
     "width" : "100%",
-    "left" : "0.5%"
+    "left" : "1%"
   });
 }
 
@@ -69,28 +69,54 @@ GUI.prototype.ViewSize = function() {
 
 GUI.prototype.initSlider = function(){
   var slider = $("<input type='range' id='h3r-slider' min='0.0' max='1.0' step='any'>");
+  this.jslider = slider;
 
   this.jGUIcontainer.append(slider);
   slider.css( {
     "display" : "inline-block",
-    "width" : "99%"
+    "width" : "98%"
   });
 
-  this.jslider = slider;
+  slider
+  .mousedown(function() {
+    this.clip.Pause();
+  }.bind(this))
+  .mousemove(function() {
+//    console.log(this.duration * this.jslider.val());
+    var time = this.duration * this.jslider.val();
+    this.clip.Time(time);
+  }.bind(this))
+  .mouseup(function() {
+    this.clip.Play();
+  }.bind(this));
+
+
 }
 
 GUI.prototype.initPlayBtn = function() {
-  var c = this.jGUIcontainer;
-  c.append("<button id='h3r-play-btn'> Play </button>");
 
-  c.css("position", "absolute");
-  var play = c.find('button#h3r-play-btn');
+  var c = this.jGUIcontainer;
+  var play = $("<button id='h3r-play-btn'> Play </button>");
   this.jplay = play;
 
+  var updateState = function(){
+    play.html(this.clip.state == "pause" ? "play" : "pause");
+  }.bind(this);
+
+
+  c.append(play);
+  c.css("position", "absolute");
+  
   play.css({
     "display" : "inline-block",
     "font-size" : "14pt",
   });
+
+  updateState();
+  play.click(function() {
+    this.clip.toggle();
+    updateState();
+  }.bind(this));
 }
 
 

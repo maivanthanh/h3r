@@ -7,46 +7,68 @@ const loader = new GLTFLoader();
 
 var H3RClip = function(data, container) {
   
-  this.initGUI(container);
-  this.clock = new THREE.Clock();
-  this.scene = new THREE.Scene();
+  this.clock    = new THREE.Clock();
+  this.scene    = new THREE.Scene();
   this.duration = 0;
-  this.state = "play";
-  global.scene = this.scene;
+  this.time     = 0;
+  this.state    = "play";
   
+  this.actions = [];
+  
+  this.initGUI(container);
+  this.initScene();
+  this.initControl();
+  
+  this.addFromFile("../../data/gltf/sketfab/backflip/scene.gltf");
+
+  this.animate();
+}
+
+H3RClip.prototype.initScene = function() {
   var size = this.GUI.ViewSize();
   this.camera = new THREE.PerspectiveCamera( 75, size.ratio , 0.1, 1000 );
   this.renderer = new THREE.WebGLRenderer( {antialias: true} );
   this.container.appendChild( this.renderer.domElement );
   this.camera.position.z = 5;
-  this.scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 3));
+  this.scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 1.3));
 
   this.scene.background = new THREE.Color( 0xffffff );
-  this.addFromFile("../../data/gltf/girl/girl-lowpoly-rig.gltf");
 
+}
+
+H3RClip.prototype.initControl = function() {
   this.control = new THREE.OrbitControls( this.camera , this.container );
   this.control.update();
-
-  this.animate();
 }
 
 H3RClip.prototype.Pause = function() {
   this.state = "pause";
+  this.actions.forEach((action) => action.paused = true);
+}
+
+H3RClip.prototype.Play = function() {
+  this.state = "play";
 }
 
 H3RClip.prototype.Time = function(time) {
+  this.time = time ? time : this.time;
+  return this.mixer.time;
 }
 
 H3RClip.prototype.initGUI = function(container) {
-  this.GUI = new GUI(container);
+  this.GUI = new GUI(container, this);
   this.container = this.GUI.ViewContainer;
 }
 
 H3RClip.prototype.addFromFile = function(path) {
   loader.load(path, function(gltf) {
-    global.gltf = global.gltf ? global.gltf : [];
-    global.gltf.push(gltf);
+    global.gltf = gltf;
+    gltf.scene.scale.x = 0.01;
+    gltf.scene.scale.y = 0.01;
+    gltf.scene.scale.z = 0.01;
+
     this.scene.add(gltf.scene);
+    
     this.scene.traverse(function (object) {
       object.frustumCulled = false;
     });
@@ -54,8 +76,9 @@ H3RClip.prototype.addFromFile = function(path) {
     if (!gltf.animations) return;
 
     gltf.animations.forEach(function(animation) {
-      this.mixer.clipAction(animation).play();
-      console.log(animation);
+      var action = this.mixer.clipAction(animation);
+      this.actions.push(action);
+      action.play();
       this.GUI.duration =
         Math.max(this.GUI.duration, animation.duration);
       this.duration = 
@@ -70,24 +93,41 @@ H3RClip.prototype.addFromFile = function(path) {
   );
 }
 
+H3RClip.prototype.toggle = function() {
+  this.state = (this.state == "play") ? "pause" : "play";
+}
+
 H3RClip.prototype.animate = function() {
 
-    requestAnimationFrame( this.animate.bind(this) );
+  requestAnimationFrame( this.animate.bind(this) );
   var size = this.GUI.ViewSize();
   this.camera.aspect = size.ratio;
   this.camera.updateProjectionMatrix();
   this.renderer.setSize( size.width, size.height );
   this.control.update();
   this.renderer.render( this.scene, this.camera );
+
   var delta = this.clock.getDelta();
-  if ( this.mixer  && this.state == "play" ) {
-    this.mixer.update(delta);
-    this.GUI.Time(this.mixer.time);
-    if (this.mixer.time > this.duration) {
-      this.mixer.time -= this.duration;
-    }
-//    console.log(this.GUI.duration, this.GUI.currentTime);
+   
+  if (!this.mixer) return;
+  
+
+  this.mixer.update(0);
+
+  if (this.state == "play") {
+    this.GUI.Time(this.time);
+    this.time += delta;
   }
+
+  this.actions.forEach(function(action) {
+    action.time = this.time;
+  }.bind(this));
+
+
+  if (this.time > this.duration) {
+    this.time -= this.duration;
+  }
+
 }
 
 export default H3RClip;
