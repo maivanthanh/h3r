@@ -29,7 +29,9 @@ H3RClip.prototype.Load = function(data) {
   }.bind(this));
 
   this.audio = new Audio(data.bgm);
-  this.audio.play();
+//  this.audio.play();
+  this.Pause();
+  this.GUI.updateState();
   
 }
 
@@ -162,6 +164,7 @@ H3RClip.prototype.animate = function() {
 
   if (this.time > this.duration) {
     this.time -= this.duration;
+    this.audio.currentTime = this.time;
   }
 
 }

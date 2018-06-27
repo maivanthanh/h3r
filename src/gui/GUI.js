@@ -32,6 +32,7 @@ GUI.prototype.initGUI = function() {
   this.jGUIcontainer = this.container.find(".h3r-gui").first();
   this.GUIcontainer = this.jGUIcontainer[0];
   this.initPlayBtn();
+  this.initVolume();
   this.initSlider();
   this.jGUIcontainer.css( {
     "position" : "absolute",
@@ -39,6 +40,33 @@ GUI.prototype.initGUI = function() {
     "width" : "100%",
     "left" : "1%"
   });
+}
+
+GUI.prototype.initVolume = function() {
+  var voldiv = $("<div class='h3r-volume-wrapper'></div>");
+
+  var vol = $("<input type='range' class='h3r-volume-slider' min='0.0' max='1.0' step='any'>");
+  var label = $("<p> volume </p>");
+  vol.val(1);
+  this.jVolume = vol;
+
+  voldiv.append(label);
+  voldiv.append(vol);
+  this.jGUIcontainer.append(voldiv);
+  voldiv.css({
+    "position": "absolute", 
+    "right" : "2%",
+    "bottom" : "20%"
+  });
+  label.css({
+    "display" : "inline-block",
+    "background" : "white"
+  });
+
+  vol.on("input", function() {
+    this.clip.audio.volume = this.jVolume.val();
+  }.bind(this));
+  
 }
 
 GUI.prototype.Time = function(time) {
@@ -68,7 +96,7 @@ GUI.prototype.ViewSize = function() {
 }
 
 GUI.prototype.initSlider = function(){
-  var slider = $("<input type='range' id='h3r-slider' min='0.0' max='1.0' step='any'>");
+  var slider = $("<input type='range' class='h3r-slider' min='0.0' max='1.0' step='any'>");
   this.jslider = slider;
 
   this.jGUIcontainer.append(slider);
@@ -99,11 +127,6 @@ GUI.prototype.initPlayBtn = function() {
   var play = $("<button id='h3r-play-btn'> Play </button>");
   this.jplay = play;
 
-  var updateState = function(){
-    play.html(this.clip.state == "pause" ? "play" : "pause");
-  }.bind(this);
-
-
   c.append(play);
   c.css("position", "absolute");
   
@@ -112,12 +135,16 @@ GUI.prototype.initPlayBtn = function() {
     "font-size" : "14pt",
   });
 
-  updateState();
+  this.updateState();
   play.click(function() {
     this.clip.Toggle();
-    updateState();
+    this.updateState();
   }.bind(this));
 }
 
+
+GUI.prototype.updateState =  function() {
+  this.jplay.html(this.clip.state == "pause" ? "Play" : "Pause");
+}
 
 export default GUI;
