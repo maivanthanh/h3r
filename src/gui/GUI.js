@@ -114,7 +114,7 @@ GUI.prototype.initPlayBtn = function() {
 
   updateState();
   play.click(function() {
-    this.clip.toggle();
+    this.clip.Toggle();
     updateState();
   }.bind(this));
 }

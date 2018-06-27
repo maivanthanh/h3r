@@ -1,10 +1,12 @@
 import H3RClip from "./H3RClip.js";
+import $ from "jquery";
 
-function CreateClip(container) {
-  return new H3RClip(undefined, container);
-}
 var h3r = { 
-  CreateClip : CreateClip
+  CreateClip : (url, container) =>  {
+    var clip = new H3RClip(container);
+    $.get(url, (data) => clip.Load(JSON.parse(data)) );
+    return clip;
+  }
 }
 
 global.h3r = h3r;

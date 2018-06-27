@@ -5,33 +5,62 @@ import GUI from  "./gui/GUI.js";
 
 const loader = new GLTFLoader();
 
-var H3RClip = function(data, container) {
+var H3RClip = function(container) {
   
   this.clock    = new THREE.Clock();
   this.scene    = new THREE.Scene();
   this.duration = 0;
   this.time     = 0;
   this.state    = "play";
-  
-  this.actions = [];
+  this.actions  = [];
   
   this.initGUI(container);
+  this.initCamera();
   this.initScene();
   this.initControl();
-  
-  this.addFromFile("../../data/gltf/sketfab/backflip/scene.gltf");
 
   this.animate();
 }
 
+H3RClip.prototype.Load = function(data) {
+
+  data.gltf.forEach( function(url) {
+    this.addFromFile(url);
+  }.bind(this));
+
+  this.audio = new Audio(data.bgm);
+  this.audio.play();
+  
+}
+
+
+H3RClip.prototype.initCamera = function() {
+  var size = this.GUI.ViewSize();
+  /**
+   * @todo auto adjust camera after load gltf file
+   */
+  this.camera = new THREE.PerspectiveCamera( 75, size.ratio , 0.1, 1000 );
+  this.camera.position.z = 10;
+  this.camera.position.y = 30;
+  this.camera.position.x = 10;
+
+
+}
 H3RClip.prototype.initScene = function() {
   var size = this.GUI.ViewSize();
-  this.camera = new THREE.PerspectiveCamera( 75, size.ratio , 0.1, 1000 );
   this.renderer = new THREE.WebGLRenderer( {antialias: true} );
   this.container.appendChild( this.renderer.domElement );
-  this.camera.position.z = 5;
-  this.scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 1.3));
+  var l1 = new THREE.HemisphereLight(0xffffff, 0x222222, 1.3);
+  l1.position.fromArray([1, 0, 0]);
+  var l2 = new THREE.HemisphereLight(0xffffff, 0x222222, 1.3);
+  l2.position.fromArray([0, 1, 0]);
+  var l3 = new THREE.HemisphereLight(0xffffff, 0x222222, 1.3);
+  l3.position.fromArray([0, 0, -1]);
 
+
+  this.scene.add(l1);
+  this.scene.add(l2);
+  this.scene.add(l3);
   this.scene.background = new THREE.Color( 0xffffff );
 
 }
@@ -44,10 +73,13 @@ H3RClip.prototype.initControl = function() {
 H3RClip.prototype.Pause = function() {
   this.state = "pause";
   this.actions.forEach((action) => action.paused = true);
+  this.audio.pause();
 }
 
 H3RClip.prototype.Play = function() {
   this.state = "play";
+  this.audio.currentTime = this.time;
+  this.audio.play();
 }
 
 H3RClip.prototype.Time = function(time) {
@@ -63,9 +95,9 @@ H3RClip.prototype.initGUI = function(container) {
 H3RClip.prototype.addFromFile = function(path) {
   loader.load(path, function(gltf) {
     global.gltf = gltf;
-    gltf.scene.scale.x = 0.01;
-    gltf.scene.scale.y = 0.01;
-    gltf.scene.scale.z = 0.01;
+    gltf.scene.scale.x = .0005;
+    gltf.scene.scale.y = .0005;
+    gltf.scene.scale.z = .0005;
 
     this.scene.add(gltf.scene);
     
@@ -93,8 +125,12 @@ H3RClip.prototype.addFromFile = function(path) {
   );
 }
 
-H3RClip.prototype.toggle = function() {
-  this.state = (this.state == "play") ? "pause" : "play";
+H3RClip.prototype.Toggle = function() {
+  if (this.state == "play") {
+    this.Pause();
+  } else {
+    this.Play();
+  }
 }
 
 H3RClip.prototype.animate = function() {
