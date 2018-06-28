@@ -22,7 +22,6 @@ GUI.prototype.initView = function() {
     width:  "100%",
     height: "100%",
     margin: "0px",
-    "border" : "3px solid black"
   });
 
 }
@@ -37,8 +36,9 @@ GUI.prototype.initGUI = function() {
   this.jGUIcontainer.css( {
     "position" : "absolute",
     "bottom": "0px",
-    "width" : "100%",
-    "left" : "1%"
+    "width" : "98%",
+    "left" : "1%",
+    "background" : "rgba(255, 255, 255, 0.5)"
   });
 }
 
@@ -46,21 +46,25 @@ GUI.prototype.initVolume = function() {
   var voldiv = $("<div class='h3r-volume-wrapper'></div>");
 
   var vol = $("<input type='range' class='h3r-volume-slider' min='0.0' max='1.0' step='any'>");
-  var label = $("<p> volume </p>");
+  var label = $("<p> vol </p>");
   vol.val(1);
   this.jVolume = vol;
 
   voldiv.append(label);
+  voldiv.append("&nbsp;");
   voldiv.append(vol);
   this.jGUIcontainer.append(voldiv);
   voldiv.css({
     "position": "absolute", 
     "right" : "2%",
-    "bottom" : "20%"
+    "bottom" : "0%"
   });
   label.css({
-    "display" : "inline-block",
-    "background" : "white"
+    "display" : "inline-block"
+  });
+
+  vol.css({
+    "vertical-align": "middle"
   });
 
   vol.on("input", function() {
@@ -102,7 +106,7 @@ GUI.prototype.initSlider = function(){
   this.jGUIcontainer.append(slider);
   slider.css( {
     "display" : "inline-block",
-    "width" : "98%"
+    "width" : "99%"
   });
 
   slider

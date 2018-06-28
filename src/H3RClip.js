@@ -63,7 +63,7 @@ H3RClip.prototype.initScene = function() {
   this.scene.add(l1);
   this.scene.add(l2);
   this.scene.add(l3);
-  this.scene.background = new THREE.Color( 0xffffff );
+  this.scene.background = new THREE.Color( 0x111111 );
 
 }
 
