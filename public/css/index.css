@@ -1,3 +1,24 @@
-h1 {
-  font-family : Inconsolata, monospace;
+h1, h2, p {
+  font-family : Old Standard TT, monospace;
+}
+
+h2 {
+  font-weight: normal;
+}
+
+#source {
+  display: inline-block;
+  position: absolute;
+  left: 3%;
+  margin-top: 3%;
+}
+
+#source > * {
+  background : rgba(255, 255, 255, 0.5);
+}
+
+#preview {
+  display: inline-block;
+  width: 90%;
+  height: 80%;
 }
