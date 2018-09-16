@@ -22,11 +22,8 @@
   },
   "homepage": "https://github.com/giangm9/h3r#readme",
   "dependencies": {
-    "jquery": "^3.3.1",
     "three": "^0.93.0",
-    "three-addons": "^1.2.0",
-    "three-full": "^6.0.0",
-    "three-gltf-loader": "^1.93.0"
+    "webpack": "^4.19.0"
   },
   "devDependencies": {
     "uglifyjs-webpack-plugin": "^1.2.6"

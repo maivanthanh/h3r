@@ -1,7 +1,6 @@
 import * as THREE from "three-full";
 import GLTFLoader from "three-gltf-loader";
 import { OrbitControl } from "three-addons";
-import GUI from  "./gui/GUI.js";
 
 const loader = new GLTFLoader();
 
