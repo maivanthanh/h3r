@@ -1,8 +1,8 @@
 module.exports = {
   entry: './src/index.js',
   output: {
-    filename: './build/h3r.js',
+    filename: './build/hmir.js',
     path: __dirname,
-    library: 'H3R'
+    library: 'hmir'
   }
 }

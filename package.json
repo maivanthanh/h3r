@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/giangm9/h3r#readme",
   "dependencies": {
+    "@types/three": "^0.92.21",
     "three": "^0.93.0",
     "webpack": "^4.19.0"
   },

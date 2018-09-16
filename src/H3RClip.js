@@ -34,7 +34,6 @@ H3RClip.prototype.Load = function(data) {
   
 }
 
-
 H3RClip.prototype.initCamera = function() {
   var size = this.GUI.ViewSize();
   /**
@@ -44,7 +43,6 @@ H3RClip.prototype.initCamera = function() {
   this.camera.position.z = 10;
   this.camera.position.y = 30;
   this.camera.position.x = 10;
-
 
 }
 H3RClip.prototype.initScene = function() {
@@ -57,7 +55,6 @@ H3RClip.prototype.initScene = function() {
   l2.position.fromArray([0, 1, 0]);
   var l3 = new THREE.HemisphereLight(0xffffff, 0x222222, 1.3);
   l3.position.fromArray([0, 0, -1]);
-
 
   this.scene.add(l1);
   this.scene.add(l2);
@@ -148,7 +145,6 @@ H3RClip.prototype.animate = function() {
    
   if (!this.mixer) return;
   
-
   this.mixer.update(0);
 
   if (this.state == "play") {
@@ -160,12 +156,11 @@ H3RClip.prototype.animate = function() {
     action.time = this.time;
   }.bind(this));
 
-
   if (this.time > this.duration) {
     this.time -= this.duration;
     this.audio.currentTime = this.time;
   }
 
 }
-
+var c = new H3RClip();
 export default H3RClip;
