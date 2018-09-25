@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
 
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>HMI's 3D Renderer</title>
-  <style>
+    <meta charset="UTF-8">
+
+    <title>HMI's 3D Renderer</title>
+    <style>
     canvas {
 
       width: 80vw;
@@ -22,21 +23,27 @@
       background-size: 40px 40px;
       background-position: 0 0, 20px 20px
     }
-  </style>
+    </style>
 </head>
 
 <body>
-  <canvas id="main">
-  </canvas>
-</body>
+    <canvas id="main">
+    </canvas>
+    <script src="../build/h3r.js">
+    </script> 
+    <script src="./vendor/jquery-3.3.1.min.js">
+    </script> 
+    <script>
 
-<script src="../build/hmir.js"> </script>
-<script src="./vendor/jquery-3.3.1.min.js""> </script>
-
-<script > 
     $(function() {
-      clip = new hmir.Clip(document.getElementById("main"));
-      clip.appendGLTF("data/gltf/cube/cube-1.glb");
+        clip = new h3r.Clip(document.getElementById("main"));
+
+
+//        clip.appendGLTF("data/gltf/cube/cube-1.glb");
+//        clip.appendH3R("./data/cman.h3r");
+
+        clip.appendH3R("./data/stage.h3r");
     })  
-</script> 
+    </script>
+</body>
 </html>
