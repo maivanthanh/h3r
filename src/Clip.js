@@ -14,6 +14,11 @@ var ClipState = {
  * @param {HTMLCanvasElement} container
  */
 function Clip(container) {
+    if ( !container) {
+        console.error("Container must be provied");
+        return;
+    }
+
     /** @type {HTMLCanvasElement} */
     this.container = container;
 
@@ -36,6 +41,9 @@ function Clip(container) {
     this.time = 0;
     this.state = ClipState.PAUSE;
     this.actions = [];
+
+
+    /** @private **/
 
     /** @type {OrbitControl} */
     this._controls = null;
@@ -61,7 +69,6 @@ Clip.prototype.appendH3R = function(url) {
         if (this.readyState == 4 && this.status == 200) {
             var serverResponse = this.responseText;
             var h3r = JSON.parse(serverResponse);
-            console.log(h3r);
             h3r.gltf.forEach(function(gltf) {
                 context.appendGLTF(gltf);
             });
@@ -85,8 +92,8 @@ Clip.prototype.appendGLTF = function (url) {
             object.frustumCulled = false;
             if (object.isMesh) {
                 object.material.side = THREE.DoubleSide;
-                //        object.castShadow = true;
-                //        object.receiveShadow = true;
+                object.castShadow = true;
+                object.receiveShadow = true;
             }
         });
 
@@ -94,6 +101,17 @@ Clip.prototype.appendGLTF = function (url) {
 
     })
 }
+
+/** @private **/
+
+Clip.prototype._size = function () {
+    return {
+        width: this.container.clientWidth,
+        height: this.container.clientHeight,
+        ratio: this.container.clientWidth / this.container.clientHeight
+    }
+}
+
 
 Clip.prototype._initLight = function() {
 
@@ -108,7 +126,7 @@ Clip.prototype._initCamera = function () {
 Clip.prototype._initScene = function () {
 
     var geometry = new THREE.BoxGeometry(1, 1, 1);
-    var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    var material = new THREE.MeshPhongMaterial({ color: 0xffffff});
     this.cube = new THREE.Mesh(geometry, material);
     this.scene.add(this.cube);
 
@@ -127,13 +145,6 @@ Clip.prototype._initRenderer = function () {
     this.renderer.setSize(this._size().width, this._size().height, false);
 }
 
-Clip.prototype._size = function () {
-    return {
-        width: this.container.clientWidth,
-        height: this.container.clientHeight,
-        ratio: this.container.clientWidth / this.container.clientHeight
-    }
-}
 
 Clip.prototype._animate = function () {
     requestAnimationFrame(this._animate.bind(this));
