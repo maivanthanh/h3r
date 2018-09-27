@@ -14,7 +14,7 @@ var ClipState = {
  * @param {HTMLCanvasElement} container
  */
 function Clip(container) {
-    if ( !container) {
+    if (!container) {
         console.error("Container must be provied");
         return;
     }
@@ -41,6 +41,7 @@ function Clip(container) {
     this.time = 0;
     this.state = ClipState.PAUSE;
     this.actions = [];
+    this.mixers = [];
 
 
     /** @private **/
@@ -62,14 +63,14 @@ function Clip(container) {
  * @param {string} url
  */
 
-Clip.prototype.appendH3R = function(url) {
+Clip.prototype.appendH3R = function (url) {
     var context = this;
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
+    xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var serverResponse = this.responseText;
             var h3r = JSON.parse(serverResponse);
-            h3r.gltf.forEach(function(gltf) {
+            h3r.gltf.forEach(function (gltf) {
                 context.appendGLTF(gltf);
             });
         }
@@ -87,6 +88,7 @@ Clip.prototype.appendH3R = function(url) {
 
 Clip.prototype.appendGLTF = function (url) {
     var context = this;
+    var delta = this.clock.getDelta();
     gltfLoader.load(url, function (gltf) {
         gltf.scene.traverse(function (object) {
             object.frustumCulled = false;
@@ -96,8 +98,18 @@ Clip.prototype.appendGLTF = function (url) {
                 object.receiveShadow = true;
             }
         });
-
         context.scene.add(gltf.scene);
+
+        var mixer = new THREE.AnimationMixer(gltf.scene);
+        context.mixers.push(mixer);
+        if (!gltf.animations) return;
+
+        gltf.animations.forEach(function (anim) {
+            var action = mixer.clipAction(anim);
+            context.actions.push(action);
+            action.play();
+        });
+
 
     })
 }
@@ -113,10 +125,10 @@ Clip.prototype._size = function () {
 }
 
 
-Clip.prototype._initLight = function() {
+Clip.prototype._initLight = function () {
 
-    var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 2 );
-    this.scene.add( light );
+    var light = new THREE.HemisphereLight(0xffffbb, 0x080820, 2);
+    this.scene.add(light);
 }
 
 Clip.prototype._initCamera = function () {
@@ -125,10 +137,10 @@ Clip.prototype._initCamera = function () {
 
 Clip.prototype._initScene = function () {
 
-    var geometry = new THREE.BoxGeometry(1, 1, 1);
-    var material = new THREE.MeshPhongMaterial({ color: 0xffffff});
-    this.cube = new THREE.Mesh(geometry, material);
-    this.scene.add(this.cube);
+    // var geometry = new THREE.BoxGeometry(1, 1, 1);
+    // var material = new THREE.MeshPhongMaterial({ color: 0xffffff});
+    // this.cube = new THREE.Mesh(geometry, material);
+    // this.scene.add(this.cube);
 
     this.camera.position.z = 5;
 
@@ -147,12 +159,18 @@ Clip.prototype._initRenderer = function () {
 
 
 Clip.prototype._animate = function () {
+    var delta = this.clock.getDelta();
     requestAnimationFrame(this._animate.bind(this));
 
-    this.cube.rotation.x += 0.01;
-    this.cube.rotation.y += 0.01;
     this.renderer.render(this.scene, this.camera);
     this._controls.update();
+    this.mixers.forEach((mixer) => { mixer.update(0); });
+
+    this.actions.forEach(function (action) {
+        action.time += delta;
+    });
+
+
 }
 
 Clip.prototype._initControls = function () {
@@ -170,11 +188,11 @@ Clip.prototype._initControls = function () {
     this._controls = controls;
 }
 
-Clip.prototype._initResize = function() {
+Clip.prototype._initResize = function () {
     var context = this;
-    window.addEventListener( 'resize', onWindowResize, false );
+    window.addEventListener('resize', onWindowResize, false);
 
-    function onWindowResize(){
+    function onWindowResize() {
 
         context.camera.aspect = context._size().ratio;
         context.camera.updateProjectionMatrix();
