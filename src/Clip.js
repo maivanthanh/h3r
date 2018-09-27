@@ -142,7 +142,8 @@ Clip.prototype._initScene = function () {
     // this.cube = new THREE.Mesh(geometry, material);
     // this.scene.add(this.cube);
 
-    this.camera.position.z = 5;
+    this.camera.position.z = 75;
+    this.camera.position.y = 30;
 
 }
 
@@ -182,7 +183,7 @@ Clip.prototype._initControls = function () {
     controls.screenSpacePanning = false;
 
     controls.minDistance = 1;
-    controls.maxDistance = 50;
+    controls.maxDistance = 100;
 
     controls.maxPolarAngle = Math.PI / 2;
     this._controls = controls;
