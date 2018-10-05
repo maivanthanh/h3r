@@ -35,15 +35,18 @@
     </script> 
     <script>
 
-    $(function() {
-        clip = new h3r.Clip(document.getElementById("main"));
+$(function() {
+  clip = new h3r.Clip(document.getElementById("main"));
+  var progress = clip.appendH3R("/examples/data/dance.h3r");
+  progress.onProgress = function(url, percent) {
+    console.log(url, percent);
+  }; 
 
-
-//        clip.appendGLTF("data/gltf/cube/cube-1.glb");
-//        clip.appendH3R("./data/cman.h3r");
-
-        clip.appendH3R("/examples/data/dance.h3r");
-    })  
+  progress.onFinishAll = function() {
+    console.log("done all");
+  }
+  console.log(clip.duration);
+})  
     </script>
 </body>
 </html>
