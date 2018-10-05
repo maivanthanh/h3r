@@ -4,8 +4,8 @@
   "description": "Hmi's 3D renderer",
   "main": "index.js",
   "scripts": {
-    "test": "webpack-dev-server --config webpack.dev.js --watch",
-    "build": "webpack --config webpack.prod.js"
+
+
   },
   "repository": {
     "type": "git",
@@ -22,8 +22,6 @@
   },
   "homepage": "https://github.com/giangm9/h3r#readme",
   "dependencies": {
-    "@types/three": "^0.92.21",
-    "three": "^0.93.0",
     "webpack": "^4.19.0"
   },
   "devDependencies": {
