@@ -81,12 +81,12 @@ function Clip(container) {
         camera.aspect = size().ratio;
         camera.updateProjectionMatrix();
 
-        context.renderer.setSize(size().width, size().height, false);
+        renderer.setSize(size().width, size().height, false);
 
     }
 
-    var light = new THREE.HemisphereLight(0xffffbb, 0x080820, 2);
-    scene.add(light);
+    scene.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 2));
+
 
     animate();
 
