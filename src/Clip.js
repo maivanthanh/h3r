@@ -26,7 +26,6 @@ function Clip(container) {
   this.toggle    = () =>  { context.state == 'pause' ? play() : pause(); }
   this.appendH3R = appendH3R;
 
-
   /** PRIVATE VARIABLES */
 
   var 
@@ -39,8 +38,6 @@ function Clip(container) {
   mixers    = [],
   controls  = null,
   progress  = new Progress;
-
-  
 
   /** PRIVATE FUNCTIONS */
 
