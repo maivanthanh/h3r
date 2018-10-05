@@ -1,6 +1,7 @@
 import * as THREE from "./libs/three.module"
 import { GLTFLoader } from "./libs/GLTFLoader"
 import { OrbitControls } from "./libs/OrbitControls"
+import { Progress } from "./Progress"
 
 const gltfLoader = new GLTFLoader();
 
@@ -8,13 +9,15 @@ const gltfLoader = new GLTFLoader();
  * Assign clip to a canvas
  * @param {HTMLCanvasElement} container
  */
+
 function Clip(container) {
   if (!container) {
     console.error("Container must be provied");
     return;
   }
 
-  /** @public PUBLIC */
+  /** PUBLIC ATTRS/METHODS */
+
   this.duration  = 0;
   this.time      = 0;
   this.state     = 'pause' // play
@@ -23,38 +26,25 @@ function Clip(container) {
   this.toggle    = () =>  { this.state == 'pause' ? play() : pause(); }
   this.appendH3R = appendH3R;
 
-  /** @private PRIVATE */
+
+  /** PRIVATE VARIABLES */
 
   var 
+  context   = this,
   container = container,
-  renderer      = null,
-  clock         = new THREE.Clock(),
-  scene         = new THREE.Scene(),
-  camera        = null,
-  actions       = [],
-  mixers        = [],
-  controls      = null;
+  renderer  = null,
+  clock     = new THREE.Clock(),
+  scene     = new THREE.Scene(),
+  camera    = null,
+  actions   = [],
+  mixers    = [],
+  controls  = null,
+  progress  = new Progress;
 
-  camera = createCamera();
-  renderer = createRenderer(size(), container);
-  controls = createControl(camera, container);
-
-  window.addEventListener('resize', onWindowResize, false);
-
-  function onWindowResize() {
-
-    camera.aspect = size().ratio;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(size().width, size().height, false);
-
-  }
-
-  scene.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 2));
-
-  animate();
+  
 
   /** PRIVATE FUNCTIONS */
+
   function animate() {
     var delta = clock.getDelta();
     requestAnimationFrame(animate);
@@ -68,23 +58,43 @@ function Clip(container) {
     })
   }
 
+  function onWindowResize() {
+
+    camera.aspect = size().ratio;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(size().width, size().height, false);
+
+  }
+
   function appendGLTF(url) {
 
-    gltfLoader.load(url, function (gltf) {
-      var 
-      gscene = gltf.scene,
-      ganim = gltf.animations;
+    gltfLoader.load(url, 
+      function (gltf) {
+        console.log(gltf);
+        var 
+        gscene = gltf.scene,
+        ganims = gltf.animations;
 
-      gscene.traverse(fixObject); 
-      scene.add(gltf.scene);
+        gscene.traverse(fixObject); 
+        scene.add(gltf.scene);
 
-      var mixer = new THREE.AnimationMixer(gscene);
-      mixers.push(mixer);
-      if (!ganim) return;
+        var mixer = new THREE.AnimationMixer(gscene);
+        mixers.push(mixer);
+        if (!ganims) return;
 
-      // Only one animation in scene
-      ganim.forEach(anim => actions.push(mixer.clipAction(anim)) );
-    })
+        // Only one animation in scene
+        ganims.forEach((anim) => {
+          var clip = mixer.clipAction(anim);
+          maxout(context.duration, anim.duration);
+          actions.push(mixer.clipAction(anim)) 
+        });
+
+      },
+      function ( xhr ) {
+        progress.triggerProgress(xhr);
+      }
+    )
   }
 
   function size() {
@@ -93,7 +103,6 @@ function Clip(container) {
       height: container.clientHeight,
       ratio: container.clientWidth / container.clientHeight
     }
-
   }
 
   function appendH3R(url) {
@@ -102,6 +111,7 @@ function Clip(container) {
       if (this.readyState == 4 && this.status == 200) {
         var serverResponse = this.responseText;
         var h3r = JSON.parse(serverResponse);
+        progress.needDone = h3r.gltf.length;
         h3r.gltf.forEach(function (gltf) {
           appendGLTF(gltf);
         });
@@ -110,6 +120,7 @@ function Clip(container) {
 
     xhttp.open("GET", url, true);
     xhttp.send();
+    return progress;
   }
 
   function play() {
@@ -119,6 +130,25 @@ function Clip(container) {
   function pause(){
     state = "pause";
   }
+
+  /** CONSTRUCTION **/
+  camera = createCamera();
+  renderer = createRenderer(size(), container);
+  controls = createControl(camera, container);
+  scene.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 2));
+  window.addEventListener('resize', onWindowResize, false);
+  animate();
+
+}
+
+/** OUTER FUNCTIONS **/
+
+function max(x, y) {
+  return Math.max(x, y);
+}
+
+function maxout(destiation, source) {
+  destiation = max(destiation, source);
 }
 
 

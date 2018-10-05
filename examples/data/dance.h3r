@@ -1,7 +1,5 @@
 {
     "gltf": [
-        "./examples/data/suyvan/scene.glb"
-
-
+        "/examples/data/suyvan/scene.glb"
     ]
 }
