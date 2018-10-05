@@ -41,6 +41,10 @@ $(function() {
   progress.onProgress = function(url, percent) {
     console.log(url, percent);
   }; 
+
+  progress.onFinishAll = function() {
+    console.log("done all");
+  }
   console.log(clip.duration);
 })  
     </script>
