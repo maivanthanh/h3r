@@ -9,9 +9,9 @@ const gltfLoader = new GLTFLoader();
  * Assign clip to a canvas
  * @param {HTMLCanvasElement} container
  */
-
 function Clip(container) {
   console.log("REV 61018")
+
   if (!container) {
     console.error("Container must be provied");
     return;
