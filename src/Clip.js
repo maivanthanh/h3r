@@ -9,8 +9,9 @@ const gltfLoader = new GLTFLoader();
  * Assign clip to a canvas
  * @param {HTMLCanvasElement} container
  */
-
 function Clip(container) {
+  console.log("REV 61018")
+
   if (!container) {
     console.error("Container must be provied");
     return;
@@ -48,7 +49,6 @@ function Clip(container) {
 
     if (context.state == "play") {
       context.time += delta;
-      console.log(context.time);
     }
 
 
@@ -164,7 +164,7 @@ function createControl(camera, container) {
   controls.screenSpacePanning = false;
 
   controls.minDistance = 1;
-  controls.maxDistance = 100;
+  controls.maxDistance = 10000;
 
   controls.maxPolarAngle = Math.PI / 2;
   return controls;

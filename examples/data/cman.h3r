@@ -1,5 +1,5 @@
 {
  "gltf" : [
-    "/examples/data/gltf/CesiumMan/CesiumMan.glb"
+    "https://github.com/giangm9/h3r/raw/master/examples/data/gltf/CesiumMan/CesiumMan.glb"
   ]
 }
