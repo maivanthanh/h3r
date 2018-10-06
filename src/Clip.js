@@ -11,6 +11,7 @@ const gltfLoader = new GLTFLoader();
  */
 
 function Clip(container) {
+  console.log("REV 61018")
   if (!container) {
     console.error("Container must be provied");
     return;
@@ -48,7 +49,6 @@ function Clip(container) {
 
     if (context.state == "play") {
       context.time += delta;
-      console.log(context.time);
     }
 
 
